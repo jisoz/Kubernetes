@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: selinon-1
+  labels:
+    app: selinon-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: selinon-1
+  template:
+    metadata:
+      labels:
+        app: selinon-1
+    spec:
+      containers:
+      - name: selinon-1-container
+        image: registry.do.bluemint.ai/notaryselinon:latest
+        # volumeMounts:
+        #   - name: shared-volume
+        #     mountPath: /app/backend/notary/contracts/docs/
+        env:
+        - name: DATABASE_NAME
+          value: "postgres"
+        - name: POSTGRES_HOST
+          value: "notarydev.default"
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_NAME
+          value: "postgres"
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_PASSWORD
+          value: "O5xjQMxPgpj4LxE3aRfqHaFRqR6RsZ3efebYVbCEIL1bLS8CRt5SCSNVgrc7NvbU"
+        - name: CELERY_BROKER_URL
+          value: "amqp://mquser:mqpass@rabbitmq-notary-0.rabbitmq-notary-headless.notary-dev.svc.cluster.local:5672/"
+        - name: RESULT_BACKEND_URL
+          value: "redis://default:redis@redis-selinon-master.default.svc.cluster.local:6379/0"
+        - name: REDISIP
+          value: "redis-selinon-master.default.svc.cluster.local"
+        - name: REDIS_PASSWORD
+          value: "redis"
+        - name: SELINON_DISPATCHER
+          value: "1"
+        - name: AWS_STORAGE_BUCKET_NAME
+          value: "notary-dev"
+        - name: MINIO_ROOT_USER
+          value: "minio"
+        - name: MINIO_ROOT_PASSWORD
+          value: "bluemintminio"
+        - name: MINIO_API_HOST
+          value: "minio.gcp.bluemint.ai"
+        - name: MINIO_CLIENT_HOST
+          value: "minio.gcp.bluemint.ai"
+        - name: LOCAL_DRIVE
+          value: "false"
+        - name: TZ
+          value: "Asia/Beirut"
+        command: ["/bin/sh", "-c", "/etc/init.d/selinon.sh"]
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8082
+        securityContext:
+          privileged: true
+      imagePullSecrets:
+        - name: regcrednotary
+      # volumes:
+      #   - name: shared-volume
+      #     persistentVolumeClaim:
+      #       claimName: shared-volume-claim
+

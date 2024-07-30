@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wildcard-front-ingress
+  annotations:
+    nginx.org/websocket-services: "front-service,notary-service"
+    # cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: '*.dev-notary.gcp.bluemint.ai'
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: front-service
+            port:
+              number: 8080
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: notary-service
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - '*.dev-notary.gcp.bluemint.ai'
+    secretName: tls-secret-wildstar-front

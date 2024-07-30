@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prod-front
+spec:
+  project: default
+  source:
+    repoURL: https://gitlab+deploy-token-9:_b3_MStSY4xqsusMzL25@gitlab.bluemint.ai/devops_bluemint/kubernetes-deployments.git #git  repo url to sync
+    targetRevision: HEAD #last commit
+    path: notary-deployments/current/front
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: notary-namespace
+
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+
+    automated:
+      selfHeal: true
+      prune: true
+

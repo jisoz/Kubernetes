@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front-deployment
+  labels:
+    app: front-notary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: front-notary
+  template:
+    metadata:
+      labels:
+        app: front-notary
+    spec:  
+      containers:  
+      - name: front-container
+        image: registry.do.bluemint.ai/notaryfront:003d392a
+        resources:
+          requests:
+            memory: "300Mi"
+            cpu: "100m"
+          limits:
+            memory: "500Mi"
+            cpu: "150m"
+        command: ["/bin/sh", "-c", "/etc/init.d/start.sh"]
+        imagePullPolicy: Always
+        env:
+        - name: TZ
+          value: "Asia/Beirut"
+        ports:
+        - containerPort: 80
+        securityContext:
+          privileged: true
+      imagePullSecrets:
+        - name: regcrednotary
+        
+

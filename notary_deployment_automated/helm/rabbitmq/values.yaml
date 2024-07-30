@@ -1,0 +1,37 @@
+image:
+  debug: true
+auth:
+  username: mquser
+  password: mqpass
+replicaCount: 1
+service:
+  type: ClusterIP
+  port: 5672
+  portName: amqp
+  nodePort: 30672
+  distPort: 25672
+  distPortName: dist
+  distNodePort: 30676
+  managerPortEnabled: true
+  managerPort: 15672
+  managerPortName: http-stats
+
+#RabbitMQ can be accessed within the cluster on port 5672 at rabbitmq-notary.default.svc.cluster.local
+
+#To access for outside the cluster, perform the following steps:
+
+#To Access the RabbitMQ AMQP port:
+
+#    echo "URL : amqp://127.0.0.1:5672/"
+#    kubectl port-forward --namespace default svc/rabbitmq-notary 5672:5672
+
+#To Access the RabbitMQ Management interface:
+
+#    echo "URL : http://127.0.0.1:15672/"
+#    kubectl port-forward --namespace default svc/rabbitmq-notary 15672:15672
+
+#Credentials:
+#    echo "Username      : mquser"
+#    echo "Password      : $(kubectl get secret --namespace default rabbitmq-notary -o jsonpath="{.data.rabbitmq-password}" | base64 -d)"
+#    echo "ErLang Cookie : $(kubectl get secret --namespace default rabbitmq-notary -o jsonpath="{.data.rabbitmq-erlang-cookie}" | base64 -d)"
+
