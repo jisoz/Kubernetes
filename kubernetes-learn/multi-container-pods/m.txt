@@ -1,0 +1,13 @@
+design-pattern of multi-container pods
+
+1-) Sidecar design-pattern
+2-) Adapter design-pattern 
+3-) Ambassador-design-pattern
+
+
+3 way containers in pods communicate :
+
+shared network Namespace
+shared storage volumes 
+shared process namespace 
+

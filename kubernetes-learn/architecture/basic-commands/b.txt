@@ -1,0 +1,20 @@
+kubectl create deployment --image=nginx nginx-app
+lubectl get deployments | kubectl get services | ... get replicaset
+
+kubectl scale deployment  nginx-app --replicas=3
+
+kubectl apply -f .....  (.yml file)
+
+kubectl describe pod nginx-app
+
+kubectl get pods -o json 
+
+kubectl exec -it  nginx-app -- /bin/bash
+
+kubectl get pods --show-labels 
+
+kubectl label pod nginx-app  hello 
+kubectl get pods --selector hello 
+
+
+

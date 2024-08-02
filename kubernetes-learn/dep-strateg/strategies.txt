@@ -1,0 +1,23 @@
+a deployment strategie is a way to change or upgrade the application , the aim is to make the change without downntime 
+
+deployment strategies automaate the whole updating process as you can simply update the pod template or desired state ,
+the deployment will alter the program state in background with actions like creating new pods , allocating more resources until the updated desired state is met 
+
+
+types:
+1-rolling update deployment
+2-recreate deployment
+3-canary deployment
+
+rolling update deployment: DEFAULT  it replaces pods one by one of previous version of your app with pods of new version without any cluster downtime 
+recreate deployment:shuts down all old pods and replaces them with new organise
+canary deployment : partial update process allows you to test new program version  on a real userbase without commitement to full rollout 
+
+in canary update startegie the dep create few new pods while keeping most pods on previous version ,
+most users still use old vesion but small subset use new version act like testers 
+if no bugs detected from this subset we can scale up the updated replicaset to produce full rollout 
+if bug detected we can e asly rollback the few updated pods until bug fixed
+
+
+
+kubectl set image deploy [name of deployment ] [name of deployment]=[new image name] 

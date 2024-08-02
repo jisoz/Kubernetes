@@ -1,0 +1,38 @@
+offers: 
+High availability
+scalability
+disaster recovery 
+
+@@@@@worker node @@@@
+worker nodes => provide a running environement for client applications these applications are encapsulated in pods 
+pods=> samllest deployable units ,group  of one or more contaienrs with shared storage 
+
+kublet =>agent running on each node and communicates with the controle plane componenets also monitor helath and resources of pods running  container
+
+kube-proxy=>agent running on each node and responsible of update and maintenance of all networking rules on node 
+
+@@@@@master node @@@@@
+
+provide a running environement for control plane responsible for managing state of kubernetes cluster 
+
+to persist cluster state conf dasta are saved in etcd 
+
+kubeapiserver => intercept restfull calls from users 
+
+schdeuler =>assign pods to nodes 
+
+controller manager => runs controllers responsible to act when nodes become unavailable
+
+etcd => key value store used to persist cluster state  (api server only can communicates with etcd)  for interacting we have etcdctl
+
+
+Namespace=>way to organise clusters into virtual sub-clusters
+Servicce=> abstraction for deployed group of pods 
+deployment =>tell kubernetes how to modify or create instance of pods 
+workloads=>application running in kubernetes
+volume like docker volume but applied to a whole pod and mounted on all containers in the pod 
+replica set => maintain a stable set of replica pods running 
+
+ingress=> manage external user accssess to the services in kubernetes cluster via http https
+
+

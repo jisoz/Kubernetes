@@ -1,0 +1,17 @@
+services are way to expose applcation running on a  set of pods as network service  
+
+type of services: clusterip service is only accessible from within kubernetes cluster you cannot make req to your pods from outside cluster 
+                  nodeport handle request that come from  outside cluster 
+                  load balencer : service accessible externelly through cloud provider (gcp aws azure ..)
+
+
+make a service to a deployment : kubectl expose deployment [name] --name=service  --type=ClusterIP --port=8080 --target-port=8080
+--port=8080:
+
+--port=8080: Specifies the port that the service will expose. This is the port that will be accessible within the cluster.
+--target-port=8080:
+
+--target-port=8080: Specifies the port on the container that the service should forward traffic to. This is the port that the application inside the pod is listening on.
+
+
+kubectl port-forward service/[name of service ] 8090:8080 
