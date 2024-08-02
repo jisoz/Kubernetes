@@ -1,0 +1,11 @@
+ingress is an object that allows access to kubernetes services from outside kubernetes cluster 
+you configure access by creating a collection of rules that define which inbound connections reach which services
+
+several ways to expose your application to outised of kubernetes cluster:
+- clusterip
+- nodeport
+-loadbalencer
+-ingress
+
+
+a service is esssentially a frontend to your application automatically reroutes traffic to available pods in an evenly distributed way 
