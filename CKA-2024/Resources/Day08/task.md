@@ -54,87 +54,91 @@ spec:
 
 
 ## Deployment
-1. Create a Deployment named `nginx` with 3 replicas. The Pods should use the `nginx:1.23.0` image and the name `nginx`. The Deployment uses the label `tier=backend`. The Pod template should use the label `app=v1`.
-2. List the Deployment and ensure the correct number of replicas is running.
-3. Update the image to `nginx:1.23.4`.
-4. Verify that the change has been rolled out to all replicas.
-5. Assign the change cause "Pick up patch version" to the revision.
-6. Scale the Deployment to 5 replicas.
-7. Have a look at the Deployment rollout history.
-8. Revert the Deployment to revision 1.
-9. Ensure that the Pods use the image `nginx:1.23.0`.
+###  Create a Deployment named `nginx` with 3 replicas. The Pods should use the `nginx:1.23.0` image and the name `nginx`. The Deployment uses the label `tier=backend`. The Pod template should use the label `app=v1`.
 
-
-
-
-
-
-
-
-
-
-
-
-## Troubleshooting the issue
-1. Apply the below YAML and fix the issue with it
-
-``` YAML
-apiVersion: v1
-kind:  Deployment
+```YAML
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: nginx-deploy
+  name: nginx  # Deployment name
   labels:
-    env: demo
+    tier: backend  # Label for the Deployment
 spec:
+  replicas: 3  # Number of pod replicas
+  selector:
+    matchLabels:
+      app: v1  # Label used for selecting pods
   template:
     metadata:
       labels:
-        env: demo
-      name: nginx
+        app: v1  # Pod template label
     spec:
       containers:
-      - image: nginx
-        name: nginx
+      - name: nginx  # Container name
+        image: nginx:1.23.0  # Nginx container image version
         ports:
-        - containerPort: 80
-  replicas: 3
-  selector:
-    matchLabels:
-      env: demo
+        - containerPort: 80  # Expose port 80
 ```
 
-2. Apply the below YAML and fix the issue with it
+### List the Deployment and ensure the correct number of replicas is running.
 
-``` YAML
-apiVersion: v1
-kind:  Deployment
-metadata:
-  name: nginx-deploy
-  labels:
-    env: demo
-spec:
-  template:
-    metadata:
-      labels:
-        env: demo
-      name: nginx
-    spec:
-      containers:
-      - image: nginx
-        name: nginx
-        ports:
-        - containerPort: 80
-  replicas: 3
-  selector:
-    matchLabels:
-      env: dev
 ```
-3. **Share your learnings**: Document your key takeaways and insights in a blog post and social media update
-4. **Make it public**: Share what you learn publicly on LinkedIn or Twitter.
-   - **Tag us and use the hashtag**: Include the following in your post:
-     - Tag [@PiyushSachdeva](https://www.linkedin.com/in/piyush-sachdeva) and [@CloudOps Community](https://www.linkedin.com/company/thecloudopscomm) (on both platforms)
-     - Use the hashtag **#40daysofkubernetes**
-     - **Embed the video**: Enhance your blog post by embedding the video lesson from the Kubernetes series. This will provide visual context and reinforce your written explanations.
+kubectl get deployments
+kubectl get rs
+
+```
+
+### Update the image to `nginx:1.23.4`
+
+- Directly from yaml file
+- from cmd -> kubectl set image deployment/nginx nginx=nginx:1.23.4
+check the update :
+- Check rollout status:
+1. kubectl rollout status deployment/nginx
+2. Verify pods: kubectl get pods -l app=v1 -o wide
+3. Inspect a pod: kubectl describe pod <pod-name>
+4. Check rollout history (optional): kubectl rollout history deployment/nginx
+
+
+### Assign the change cause "Pick up patch version" to the revision.
+``` 
+kubectl annotate deployment nginx kubernetes.io/change-cause="Pick up patch version"
+kubectl rollout history deployment/nginx
+
+ ```
+
+###  Scale the Deployment to 5 replicas.
+
+```  kubectl scale deployment/nginx --replicas=5 ```
+
+### Have a look at the Deployment rollout history.
+
+``` kubectl rollout history deployment/nginx ```
+
+
+### Revert the Deployment to revision 1.
+```
+kubectl rollout undo deployment/nginx --to-revision=1
+
+```
+
+
+### Ensure that the Pods use the image `nginx:1.23.0`.
+kubectl get pods -l app=v1 -o wide
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Blog Post Focus 📝
 
