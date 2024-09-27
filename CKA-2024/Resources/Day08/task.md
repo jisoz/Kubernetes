@@ -8,9 +8,50 @@ In this exercise, you will create a Deployment with multiple replicas. After ins
 
 
 ## Replicaset
-- Create a new Replicaset based on the nginx image with 3 replicas
-- Update the replicas to 4 from the YAML
-- Update the replicas to 6 from the command line
+### Create a new Replicaset based on the nginx image with 3 replicas
+-  create nginx-replicaset.yaml
+ ```YAML
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: nginx-replicaset
+  labels:
+    app: nginx
+spec:
+  replicas: 3  # Specifies 3 replicas
+  selector:
+    matchLabels:
+      app: nginx  # Ensure this matches the pod template labels
+  template:
+    metadata:
+      labels:
+        app: nginx  # Label of the pods
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest  # Nginx image
+        ports:
+        - containerPort: 80
+
+  ```
+####  Update the replicas to 4 from the YAML
+- Edit the nginx-replicaset.yaml file and change the replicas field from 3 to 4:
+  ```YAML
+   spec:
+  replicas: 4  # Change replicas from 3 to 4
+
+
+
+  ```
+
+#### Update the replicas to 6 from the command line  
+```CMD
+ kubectl scale rs/nginx-replicaset --replicas=6
+
+
+```
+  
+
 
 ## Deployment
 1. Create a Deployment named `nginx` with 3 replicas. The Pods should use the `nginx:1.23.0` image and the name `nginx`. The Deployment uses the label `tier=backend`. The Pod template should use the label `app=v1`.
@@ -22,6 +63,17 @@ In this exercise, you will create a Deployment with multiple replicas. After ins
 7. Have a look at the Deployment rollout history.
 8. Revert the Deployment to revision 1.
 9. Ensure that the Pods use the image `nginx:1.23.0`.
+
+
+
+
+
+
+
+
+
+
+
 
 ## Troubleshooting the issue
 1. Apply the below YAML and fix the issue with it
