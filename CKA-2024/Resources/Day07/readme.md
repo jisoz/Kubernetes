@@ -27,3 +27,13 @@ spec:
     - containerPort: 80
 ```
 
+## kubectl  explain pod -> explain
+## kubectl delete pod nginx-pod -> delete the pod
+## kubectl apply -f pod.yaml -> apply the yaml file 
+## kubectl get pods -> get all pods 
+## kubectl describe pod nginx-pod  -> get more info and troubleshoot 
+## kubectl edit pod nginx-pod
+## kubectl exec -it nginx-pod  --sh -> ener inside the pod 
+## kubectl get pods --show-labels
+## kubeectl get pods -o wide 
+## kubectl get nodes 
