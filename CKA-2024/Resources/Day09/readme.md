@@ -20,7 +20,10 @@ nodes:
 - role: worker
 - role: worker
 ```
+```
+kind create cluster --config kind.yaml --name cka-cluster
 
+```
 ### What is Service in Kubernetes
 
 Different applications communicate with each other within Kubernetes using a service; it is also used to access applications outside the cluster.
