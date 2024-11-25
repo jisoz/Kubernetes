@@ -1,0 +1,25 @@
+- In Kubernetes, a Pod is the smallest and simplest unit that can be deployed. It represents a single instance of a running process in your cluster and can contain one or more containers that share the same network and storage.
+
+<!-- apiVersion: v1
+kind: Pod
+metadata:
+  name: my-app-pod
+spec:
+  containers:
+  - name: my-app-container
+    image: nginx:latest
+    ports:
+    - containerPort: 80 -->
+
+``` kubectl get pods -o wide ``` -> ip 172.17.0.3
+
+- When you create a Pod in Kubernetes, an IP address is automatically assigned to it within the Kubernetes network. This IP is used for internal communication between Pods in the cluster. The IP address of a Pod is unique within the cluster and can be accessed by other Pods or services within the same cluster.
+
+Who Assigns the IP?
+The Kubernetes network is responsible for assigning the IP to the Pod. This is done by the Kubelet, which is the primary agent running on each node in the Kubernetes cluster.
+The Kubelet ensures that the Pod gets a unique IP from the Pod network range, which is predefined during the cluster setup. The Kubernetes networking model ensures that every Pod can communicate with any other Pod without NAT (Network Address Translation).
+
+
+``` kubectl describe pod nginx  ```
+
+

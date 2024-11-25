@@ -1,0 +1,68 @@
+# pod
+
+- In Kubernetes, a Pod is the smallest and simplest unit that can be deployed. It represents a single instance of a running process in your cluster and can contain one or more containers that share the same network and storage.
+
+<!-- apiVersion: v1
+kind: Pod
+metadata:
+  name: my-app-pod
+spec:
+  containers:
+  - name: my-app-container
+    image: nginx:latest
+    ports:
+    - containerPort: 80 -->
+
+``` kubectl get pods -o wide ``` -> ip 172.17.0.3
+
+- When you create a Pod in Kubernetes, an IP address is automatically assigned to it within the Kubernetes network. This IP is used for internal communication between Pods in the cluster. The IP address of a Pod is unique within the cluster and can be accessed by other Pods or services within the same cluster.
+
+Who Assigns the IP?
+The Kubernetes network is responsible for assigning the IP to the Pod. This is done by the Kubelet, which is the primary agent running on each node in the Kubernetes cluster.
+The Kubelet ensures that the Pod gets a unique IP from the Pod network range, which is predefined during the cluster setup. The Kubernetes networking model ensures that every Pod can communicate with any other Pod without NAT (Network Address Translation).
+
+
+``` kubectl describe pod nginx  ```
+
+# deployment
+
+
+
+deploy -> replicaset -> pod
+
+- In Kubernetes, a Deployment is an object that manages a set of replicas of a Pod, ensuring that the desired number of replicas are running at all times. A DeploymentSet is not an official Kubernetes term, but you may be referring to a Deployment that manages a set of Pods, or a ReplicaSet, which is closely related to Deployments in Kubernetes.
+
+Key Concepts
+Pod: The smallest deployable unit in Kubernetes, which represents a single instance of a running process.
+ReplicaSet: Ensures that a specified number of replica Pods are running at any given time. ReplicaSets are typically controlled by Deployments.
+Deployment: A higher-level abstraction that manages ReplicaSets and provides features like rolling updates, scaling, and self-healing.
+Deployment Example
+A Deployment is used to create and manage a set of Pods and ReplicaSets. Here’s a simple example of a Deployment YAML file.
+
+<!-- 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3  # The number of Pods to maintain
+  selector:
+    matchLabels:
+      app: nginx  # The label to match the Pods
+  template:
+    metadata:
+      labels:
+        app: nginx  # Label for Pods
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest  # The container image to use
+        ports:
+        - containerPort: 80  # Expose port 80 in the container -->
+
+
+
+
+
+
+
