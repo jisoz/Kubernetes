@@ -1,1 +1,5 @@
 # what is gitops
+
+gitops use git as a single source of truth to deliver applications and infrastructure
+
+![alt text](image.png)
