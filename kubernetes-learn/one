@@ -60,9 +60,619 @@ spec:
         ports:
         - containerPort: 80  # Expose port 80 in the container -->
 
+# services
+
+svc -> load balancing
+        service discovery 
+        expose to world
+
+
+1.clusterip -> inside (discovery | loadbalencing)
+2.nodeport -> inside org (worker nodes)
+3.loadbalencer -> external 
+
+
+
+- In Kubernetes, a Service is an abstraction that defines a logical set of Pods and a policy to access them. Services provide a stable network endpoint for Pods that can be dynamically created or destroyed (as part of scaling or updates).
+
+Key Concepts
+Pods are ephemeral: Their IP addresses can change, so you can't reliably access a Pod by its IP. Services provide a consistent way to access Pods.
+Discovery and Load Balancing: Services use selectors to find Pods and distribute traffic evenly among them.
+Stable Endpoint: A Service has a fixed IP (ClusterIP) or DNS name, even if the underlying Pods change.
+Types of Services:
+ClusterIP: Exposes the service only within the cluster.
+NodePort: Exposes the service on each Node's IP at a static port.
+LoadBalancer: Exposes the service externally using a cloud provider's load balancer.
+
+
+
+<!-- apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx  # Matches Pods with this label
+  ports:
+  - protocol: TCP
+    port: 80        # Port exposed by the Service
+    targetPort: 80  # Port on the container
+  type: ClusterIP   # Accessible only within the cluster -->
+
+
+
+
+
+1. ClusterIP (Internal-only Service)
+Real-World Example:
+Use Case: A microservices-based application where a frontend service needs to communicate with a backend database or API service within the cluster.
+
+Scenario: You have a frontend application (e.g., React or Angular) running in one Pod and a backend API (Node.js, Django, etc.) running in another Pod. The backend API is exposed using a ClusterIP Service so that only other Pods in the cluster can access it.
+
+Example Workflow:
+A React frontend Pod sends a request to the backend API Service (http://backend-service) using its ClusterIP.
+External users cannot directly access the backend Service since it’s not exposed outside the cluster.
+2. NodePort (Expose to external users through a node's IP)
+Real-World Example:
+Use Case: Testing a basic application on your local cluster before setting up a production-grade LoadBalancer.
+
+Scenario: You're hosting a simple website (e.g., Nginx) and want to expose it to external users without using a cloud provider’s load balancer.
+
+Example Workflow:
+The Nginx Service is exposed using NodePort.
+Users can access the website through http://<NodeIP>:<NodePort>. For example, http://192.168.1.10:30001.
+Limitations:
+Suitable for small-scale or testing environments.
+Less flexible for large-scale production since Node IPs and ports might not be user-friendly.
+3. LoadBalancer (Expose using cloud provider's load balancer)
+Real-World Example:
+Use Case: Hosting a customer-facing application in a production environment on a cloud platform like AWS, Azure, or Google Cloud.
+
+Scenario: You deploy an e-commerce website. The frontend Service is exposed using a LoadBalancer, allowing customers from anywhere in the world to access it.
+
+Example Workflow:
+Kubernetes provisions a cloud provider’s load balancer (e.g., AWS Elastic Load Balancer, Azure Load Balancer).
+The Service gets an external IP address, such as 52.14.123.456, which is used by customers to access the application.
+4. ExternalName (Redirect traffic to an external DNS name)
+Real-World Example:
+Use Case: Integrating an external SaaS service (e.g., a payment gateway) into your Kubernetes-based application.
+
+Scenario: Your application communicates with an external payment processor (e.g., api.paymentgateway.com). You want to standardize access by creating a Kubernetes Service to reference the external API.
+
+Example Workflow:
+You define an ExternalName Service mapping to the external DNS (api.paymentgateway.com).
+When your Pods query http://payment-service, Kubernetes resolves it to api.paymentgateway.com.
+
+
+
+
+# ingress
+
+![alt text](image.png)
+![alt text](image-1.png)
+
+Ingress is an API object in Kubernetes that manages external access to services within a cluster. It provides a way to define rules for routing HTTP(S) traffic to different services based on URLs, hostnames, or other routing criteria.
+
+Key Features of Ingress
+Path-Based Routing:
+
+Route traffic to different services based on URL paths.
+Example:
+/app1 -> Service A
+/app2 -> Service B
+Host-Based Routing:
+
+Route traffic based on hostnames.
+Example:
+app1.example.com -> Service A
+app2.example.com -> Service B
+TLS Termination:
+
+Manage SSL certificates for secure communication.
+Centralized Traffic Control:
+
+Acts as a single entry point for multiple services, simplifying management.
+Custom Rules:
+
+Add advanced routing rules, such as redirects and rewrites.
+
+
+<!-- apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: example-ingress
+spec:
+  rules:
+  - host: app1.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: app1-service
+            port:
+              number: 80
+  - host: app2.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: app2-service
+            port:
+              number: 80 -->
+
+
+
+
+# rbac
+Role-Based Access Control (RBAC) in Kubernetes is a system that manages access to Kubernetes resources based on the roles assigned to users, groups, or service accounts. It provides fine-grained control over what actions can be performed on which resources within a Kubernetes cluster.
+
+Key Concepts in RBAC
+Role:
+
+A set of permissions (rules) defined within a namespace.
+Specifies what actions (e.g., get, list, create, delete) are allowed on specific Kubernetes resources (e.g., pods, deployments).
+Example:
+
+<!-- apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"] -->
+
+ClusterRole:
+
+Similar to a Role but applies cluster-wide or to all namespaces.
+Typically used for cluster-wide permissions like managing nodes or persistent volumes.
+Example:
+
+<!-- apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-admin
+rules:
+- apiGroups: [""]
+  resources: ["*"]
+  verbs: ["*"] -->
+
+
+RoleBinding:
+
+Binds a Role to a user, group, or service account within a specific namespace.
+Example:
+yaml
+Copy code
+<!-- apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods
+  namespace: default
+subjects:
+- kind: User
+  name: jane-doe
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io -->
+ClusterRoleBinding:
+
+Binds a ClusterRole to a user, group, or service account across the entire cluster.
+Example:
+
+<!-- apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: admin-binding
+subjects:
+- kind: User
+  name: admin-user
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io -->
+How RBAC Works
+Define Permissions:
+
+Use a Role or ClusterRole to define what actions are allowed and on which resources.
+Bind Permissions:
+
+Use a RoleBinding or ClusterRoleBinding to associate the defined permissions with specific users, groups, or service accounts.
+Authorization Process:
+
+When a user or service account sends a request to the API server, Kubernetes checks if the request matches the permissions granted in their role binding.
+
+
+
+# custom resource 
+
+n Kubernetes, Custom Resources (CRs) and Custom Controllers are tools to extend the Kubernetes API and manage resources that are not natively supported. They allow developers to define and manage custom objects and implement logic to control their behavior. Here's a deep dive into both concepts:
+
+
+Custom Resources (CRs)
+A Custom Resource is an extension of the Kubernetes API that allows you to define your own resource types. These resources function like built-in Kubernetes objects (e.g., Pods, Services) but are customized to meet specific application requirements.
+
+Key Concepts
+Custom Resource Definition (CRD):
+
+A YAML configuration that registers a new resource type in the Kubernetes cluster.
+Defines the structure, schema, and behavior of the custom resource.
+Once created, users can interact with the custom resource using standard Kubernetes tools like kubectl.
+Custom Resource Object:
+
+An instance of the custom resource defined by the CRD.
+Like a Pod is an instance of the Pod API, a custom resource is an instance of its CRD.
+Use Cases
+Managing application configurations.
+Abstracting infrastructure components (e.g., databases, queues).
+Extending Kubernetes to manage non-Kubernetes workloads.
+
+How Custom Resources and Controllers Work Together
+CRD Registers the Custom Resource:
+
+Adds a new API endpoint, e.g., /apis/example.com/v1/mysqlinstances.
+Custom Resource Defines Desired State:
+
+A user creates a resource like MySQLInstance specifying the database configuration.
+Custom Controller Maintains Desired State:
+
+Watches MySQLInstance resources and performs actions to ensure the database is provisioned or updated as defined in the spec.
+
+
+# config map and secrets
+In Kubernetes, ConfigMaps and Secrets are objects used to store configuration data that can be used by applications running in Pods. Both provide a way to decouple application configuration from the application code, enabling better management and portability.
+
+
+ConfigMaps
+A ConfigMap is a Kubernetes object used to store non-sensitive configuration data in key-value pairs. ConfigMaps are typically used for storing settings, environment variables, or configuration files that do not contain sensitive information.
+
+Key Features
+Stores configuration as plain text.
+Non-sensitive data.
+Accessible by Pods as environment variables, command-line arguments, or mounted files.
+Use Cases
+Passing configuration data to applications (e.g., API URLs, application settings).
+Externalizing application configuration to make it environment-agnostic.
+Sharing configuration between multiple Pods.
+Example: Creating and Using a ConfigMap
+Define a ConfigMap
+
+yaml
+Copy code
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  APP_MODE: "production"
+  APP_PORT: "8080"
+Using the ConfigMap in a Pod
+
+yaml
+Copy code
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-pod
+spec:
+  containers:
+  - name: app-container
+    image: my-app:latest
+    env:
+    - name: APP_MODE
+      valueFrom:
+        configMapKeyRef:
+          name: app-config
+          key: APP_MODE
+    - name: APP_PORT
+      valueFrom:
+        configMapKeyRef:
+          name: app-config
+          key: APP_PORT
+Mounted as a File
+
+yaml
+Copy code
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-pod
+spec:
+  containers:
+  - name: app-container
+    image: my-app:latest
+    volumeMounts:
+    - name: config-volume
+      mountPath: /app/config
+  volumes:
+  - name: config-volume
+    configMap:
+      name: app-config
 
 
 
 
 
 
+
+
+
+      Secrets
+A Secret is a Kubernetes object designed to store sensitive information, such as passwords, API tokens, and SSH keys. Like ConfigMaps, Secrets can also be consumed by Pods as environment variables, mounted files, or command-line arguments.
+
+Key Features
+Data is stored in base64-encoded format.
+Sensitive data, unlike ConfigMaps.
+Can integrate with external secret management solutions (e.g., HashiCorp Vault).
+Use Cases
+Storing application credentials (e.g., database passwords).
+Managing private keys and certificates.
+Passing sensitive data securely to applications.
+Example: Creating and Using a Secret
+Define a Secret
+
+yaml
+Copy code
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+type: Opaque
+data:
+  username: YWRtaW4=    # Base64 encoded value for 'admin'
+  password: cGFzc3dvcmQ= # Base64 encoded value for 'password'
+Note: Encode values using echo -n "admin" | base64.
+
+Using the Secret in a Pod
+
+yaml
+Copy code
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-pod
+spec:
+  containers:
+  - name: app-container
+    image: my-app:latest
+    env:
+    - name: DB_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: db-credentials
+          key: username
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: db-credentials
+          key: password
+Mounted as a File
+
+yaml
+Copy code
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-pod
+spec:
+  containers:
+  - name: app-container
+    image: my-app:latest
+    volumeMounts:
+    - name: secret-volume
+      mountPath: /etc/credentials
+      readOnly: true
+  volumes:
+  - name: secret-volume
+    secret:
+      secretName: db-credentials
+
+
+
+
+# kubernets monitoring
+
+
+
+
+
+
+# kubernets deployments strategies
+
+- rolling update (default)
+- canary        
+                 ingress controller
+- blue green     
+
+
+
+rolling update:
+A Rolling Update in Kubernetes is a deployment strategy that updates the pods in a controlled, gradual manner to ensure there is no downtime for the application. This strategy replaces old pods with new ones incrementally, maintaining service availability throughout the update process.
+
+
+
+
+A Rolling Update in Kubernetes is a deployment strategy that updates the pods in a controlled, gradual manner to ensure there is no downtime for the application. This strategy replaces old pods with new ones incrementally, maintaining service availability throughout the update process.
+
+Key Concepts of Rolling Update
+Gradual Replacement:
+
+Only a subset of pods is replaced at a time, ensuring that some old pods are always available to serve requests.
+This avoids service interruptions during the update process.
+Deployment Object:
+
+Rolling updates are managed via the Deployment object in Kubernetes, which defines the desired state of your application.
+ReplicaSets:
+
+Kubernetes manages a new ReplicaSet for the updated version while gradually scaling down the old ReplicaSet.
+Control Parameters:
+
+maxUnavailable: Maximum number of pods that can be unavailable during the update.
+maxSurge: Maximum number of extra pods that can be created temporarily during the update.
+How Rolling Update Works
+Initial State:
+
+Assume you have a deployment with 4 pods running version v1 of your application.
+Starting the Update:
+
+You modify the deployment to use a new container image (e.g., v2).
+Kubernetes creates a new ReplicaSet for v2.
+Updating Pods:
+
+Kubernetes terminates a pod running v1 and creates a pod running v2.
+This process continues incrementally, adhering to the maxUnavailable and maxSurge settings.
+Completion:
+
+Once all v1 pods are replaced with v2, the old ReplicaSet is scaled down to 0, and only the new ReplicaSet remains active.
+
+
+![alt text](image-2.png)
+
+
+
+<!-- apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rolling-update-example
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: rolling-update-example
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1 # Only 1 pod can be unavailable at a time
+      maxSurge: 1       # Only 1 extra pod can be created at a time
+  template:
+    metadata:
+      labels:
+        app: rolling-update-example
+    spec:
+      containers:
+      - name: app-container
+        image: my-app:v1 -->
+
+
+
+Update the Deployment:
+Update the image in the Deployment:
+
+bash
+Copy code
+kubectl set image deployment rolling-update-example app-container=my-app:v2
+Kubernetes will gradually replace the pods as per the strategy.rollingUpdate configuration.
+
+
+
+
+Monitoring a Rolling Update
+You can monitor the rolling update process using the following commands:
+
+Check Deployment Status:
+
+bash
+Copy code
+kubectl get deployment rolling-update-example
+Describe Deployment:
+
+bash
+Copy code
+kubectl describe deployment rolling-update-example
+View Pod Status:
+
+bash
+Copy code
+kubectl get pods -l app=rolling-update-example
+Rollback in Rolling Update
+If something goes wrong during a rolling update, you can roll back to the previous version:
+
+Rollback Command:
+bash
+Copy code
+kubectl rollout undo deployment rolling-update-example
+View Rollout History:
+bash
+Copy code
+kubectl rollout history deployment rolling-update-example
+Advantages of Rolling Updates
+No Downtime: The application remains available during the update.
+Fine-Grained Control: Parameters like maxUnavailable and maxSurge provide precise control over the update process.
+Automatic Rollback: Kubernetes can detect failures and automatically rollback if necessary.
+Limitations
+Not Suitable for Major Changes:
+
+If the update involves breaking changes (e.g., database schema changes), a rolling update may not work without additional precautions.
+Partial Availability:
+
+During the update, the application might temporarily run mixed versions, which could cause issues if the versions are not compatible.
+
+ ### canary deploy
+Canary Deployment is a deployment strategy in Kubernetes (and other environments) where a new version of an application is gradually rolled out to a small subset of users or environment traffic. This allows you to test the new version in production while limiting potential impact to users if issues arise.
+
+
+How Canary Deployment Works
+Initial Setup:
+
+An application with version v1 is running in production.
+A new version v2 is ready for deployment.
+Deploy Canary Pods:
+
+Deploy a small number of pods running version v2 alongside the existing v1 pods.
+This can be a fixed percentage of traffic or user base.
+Traffic Split:
+
+A fraction of the traffic is directed to v2 pods while most traffic still goes to v1.
+Monitoring and testing ensure that v2 is functioning correctly.
+Monitoring:
+
+Metrics like response time, error rate, and user feedback are tracked.
+If v2 performs as expected, more traffic is gradually shifted to v2.
+Complete Rollout:
+
+Once confidence is built in the stability of v2, all traffic is shifted to it, and v1 is removed.
+Rollback (if needed):
+
+If issues are detected during the canary phase, rollback to v1 without affecting the majority of users.
+
+
+
+
+
+#### blue green depl
+![alt text](image-3.png)
+
+
+Blue-Green Deployment is a deployment strategy designed to minimize downtime and reduce risk during application updates by running two environments simultaneously: blue (current/live environment) and green (new version environment).
+
+How Blue-Green Deployment Works
+Initial State:
+
+The blue environment is the live production environment that serves all traffic.
+The green environment is set up but not yet live; it contains the new version of the application.
+Deploy to Green:
+
+The new version of the application is deployed to the green environment.
+The blue environment continues serving user traffic without interruption.
+Testing in Green:
+
+The green environment is tested with production-like traffic or a small subset of real traffic.
+Monitoring tools are used to ensure the new version behaves as expected.
+Switch Traffic:
+
+When the green environment passes all tests, traffic is switched from the blue environment to the green environment.
+This traffic shift is typically handled by updating a load balancer or DNS entry.
+Rollback (if needed):
+
+If issues are discovered after the traffic switch, the load balancer can redirect traffic back to the blue environment, as it is still operational.
+Cleanup:
+
+Once the green environment is stable and confirmed, the blue environment can be decommissioned or prepared for the next deployment cycle.
