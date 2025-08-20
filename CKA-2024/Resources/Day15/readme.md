@@ -22,6 +22,10 @@ Node Affinity lets you define complex rules for where your pods can be scheduled
 
 ---
 
+<img width="539" height="247" alt="image" src="https://github.com/user-attachments/assets/bf46aa9e-93ed-4de0-a707-018a62ca73d7" />
+
+
+
 ## Properties in Node Affinity
 - requiredDuringSchedulingIgnoredDuringExecution
 - preferredDuringSchedulingIgnoredDuringExecution
