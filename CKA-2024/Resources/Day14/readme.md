@@ -62,6 +62,10 @@ spec:
 
 >Note: This pod specification defines a toleration for the "gpu" taint with the effect "NoSchedule." This allows the pod to be scheduled on tainted nodes.
 
+
+<img width="1310" height="672" alt="image" src="https://github.com/user-attachments/assets/b0b370b6-e578-4fa6-86a4-fe222fcf43be" />
+
+
 ### Labels vs Taints/Tolerations
 
 Labels group nodes based on size, type,env, etc. Unlike taints, labels don't directly affect scheduling but are useful for organizing resources.
