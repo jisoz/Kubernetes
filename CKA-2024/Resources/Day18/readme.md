@@ -5,6 +5,10 @@
 [![Day 18/40 - Health Probes in kubernetes](https://img.youtube.com/vi/x2e6pIBLKzw/sddefault.jpg)](https://youtu.be/x2e6pIBLKzw)
 
 
+
+In Kubernetes, health probes are mechanisms the kubelet uses to check the health of your containers and ensure they’re working properly. If a container is unhealthy, Kubernetes can restart it or stop sending traffic to it until it’s ready again.
+
+
 ### What are probes?
 - To investigate or monitor something and to take necessary actions
 
@@ -16,6 +20,38 @@
 - Readiness ( Ensure application is ready)
 - Liveness ( Restart the application if health checks fail)
 - Startup ( Probes for legacy applications that need a lot of time to start)
+
+
+  Liveness Probe
+
+Purpose: Checks if the container is still running correctly.
+
+If it fails → Kubernetes restarts the container.
+
+Example use: If your app hangs or deadlocks, the liveness probe will catch it.
+
+
+
+
+Readiness Probe
+
+Purpose: Checks if the container is ready to serve requests.
+
+If it fails → Kubernetes removes the pod from the Service endpoints, so it won’t receive traffic.
+
+Example use: Your app might take time to load configs or connect to a DB before serving traffic.
+
+
+Startup Probe
+
+Purpose: Checks if the application has started successfully.
+
+Useful for slow-starting apps (e.g., large Java apps).
+
+Until it succeeds, Kubernetes won’t run liveness or readiness probes.
+
+
+
 
 ### Types of health checks they perform?
 - HTTP/TCP/command
