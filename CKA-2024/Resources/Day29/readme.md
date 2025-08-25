@@ -62,6 +62,8 @@ RWX	Yes	Yes	RW
 RWOP	No (1 Pod only)	No	RW
 
 
+### pv and pvc
+
 🔹 PersistentVolume (PV)
 
 A PV is a piece of storage in the cluster that has been provisioned (either statically by an admin or dynamically by Kubernetes).
@@ -143,6 +145,36 @@ spec:
 
 
 The Pod now gets persistent storage through the PVC.
+
+
+#### Reclaim policies 
+
+In Kubernetes, Reclaim Policies define what happens to a PersistentVolume (PV) once the PersistentVolumeClaim (PVC) that was using it is deleted.
+
+There are three types of reclaim policies:
+
+1. Retain
+
+The PV is not deleted, even after the PVC is removed.
+
+The data is kept safe, but the PV goes into a "Released" state.
+
+An admin must manually clean up or rebind it.
+
+Use case: When data is sensitive and should not be automatically deleted (e.g., databases, logs).
+
+2. Delete
+
+The PV and the underlying storage resource (e.g., AWS EBS, GCP Persistent Disk, Azure Disk) are deleted automatically when the PVC is deleted.
+
+Use case: For temporary data where automatic cleanup is desired.
+
+3. Recycle (deprecated)
+
+The PV’s data is scrubbed with a basic rm -rf /thevolume/* and then made available again.
+
+This is considered unsafe for production, so Kubernetes deprecated it.
+
 
 ### Sample pv used in the demo
 
