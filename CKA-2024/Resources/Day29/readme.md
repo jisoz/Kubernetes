@@ -62,6 +62,87 @@ RWX	Yes	Yes	RW
 RWOP	No (1 Pod only)	No	RW
 
 
+🔹 PersistentVolume (PV)
+
+A PV is a piece of storage in the cluster that has been provisioned (either statically by an admin or dynamically by Kubernetes).
+
+It represents the actual storage (like AWS EBS, GCE Persistent Disk, NFS, Ceph, etc).
+
+PVs are cluster resources just like nodes or CPU.
+
+🔹 PersistentVolumeClaim (PVC)
+
+A PVC is a request for storage by a user/application.
+
+Instead of directly asking for a specific storage backend, apps say:
+“I need 10Gi of storage, with ReadWriteOnce access.”
+
+Kubernetes then matches this claim with a suitable PV.
+
+🔹 How PVC works with PV
+
+Admin/Provisioner creates PV (or Kubernetes dynamically provisions it).
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-demo
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /mnt/data
+
+
+This makes 10Gi storage available in the cluster.
+
+Developer creates PVC to request storage:
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-demo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+
+This asks for 5Gi with ReadWriteOnce.
+
+Binding happens automatically
+
+Kubernetes finds a PV that satisfies the request (storage ≥ 5Gi, compatible access mode).
+
+The PVC gets bound to that PV.
+
+Pod uses PVC
+
+Instead of mounting PV directly, a Pod mounts the PVC:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app
+spec:
+  containers:
+  - name: myapp
+    image: nginx
+    volumeMounts:
+    - mountPath: "/usr/share/nginx/html"
+      name: mydata
+  volumes:
+  - name: mydata
+    persistentVolumeClaim:
+      claimName: pvc-demo
+
+
+The Pod now gets persistent storage through the PVC.
 
 ### Sample pv used in the demo
 
